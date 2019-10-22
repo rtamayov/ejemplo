@@ -1,17 +1,20 @@
 package com.example.numero;
 
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.TextView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity {
 
     TextView tvNumber;
+    TextView tvPopWindows;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,24 +43,26 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tvNumber.setText(Integer.toString(getRandomNumber(1,9)));
+
+                onButtonShowPopupWindowClick(tvNumber);
+
             }
         });
     }
 
     private String getDayNumber() {
         Date dateNow = new Date();
-        SimpleDateFormat simpleDate =  new SimpleDateFormat("MM/dd/yyyy");
-        String strDateNow = simpleDate.format(dateNow)+" 00:00:00 AM";
+        SimpleDateFormat simpleDate = new SimpleDateFormat("MM/dd/yyyy");
+        String strDateNow = simpleDate.format(dateNow) + " 00:00:00 AM";
 
 
         String dateStringThen = "01/01/0001 00:00:00 AM";
-        Date convertedDateThen  = getDateByString(dateStringThen);
+        Date convertedDateThen = getDateByString(dateStringThen);
         Date convertedDateNow = getDateByString(strDateNow);
 
-        long timeInBetween = getUnitBetweenDates(convertedDateThen ,convertedDateNow, TimeUnit.DAYS)+1;
+        long timeInBetween = getUnitBetweenDates(convertedDateThen, convertedDateNow, TimeUnit.DAYS) + 1;
 
-        String strSumOfDigits = Long.toString( sumOfDigits((int) timeInBetween));
+        String strSumOfDigits = Long.toString(sumOfDigits((int) timeInBetween));
 
         return strSumOfDigits;
     }
@@ -97,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private int getRandomNumber(int min,int max) {
+    private int getRandomNumber(int min, int max) {
         return (new Random()).nextInt((max - min) + 1) + min;
     }
 
@@ -106,18 +112,46 @@ public class MainActivity extends AppCompatActivity {
         return unit.convert(timeDiff, TimeUnit.MILLISECONDS);
     }
 
-    public int sumOfDigits(int num)
-    {
+    public int sumOfDigits(int num) {
         int sum = 0;
 
-        while (num > 0)
-        {
+        while (num > 0) {
             sum = sum + num % 10;
             num = num / 10;
         }
 
-        sum = (sum <10) ? sum : sumOfDigits(sum);
+        sum = (sum < 10) ? sum : sumOfDigits(sum);
 
         return sum;
+    }
+
+    public void onButtonShowPopupWindowClick(View view) {
+
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_window, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+
+        tvPopWindows = popupView.findViewById(R.id.pw_text);
+        tvPopWindows.setText(Integer.toString(getRandomNumber(1,9)));
     }
 }
