@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
 
     TextView tvNumber;
     TextView tvPopWindows;
+    TextView tvDiscover1;
+    TextView tvDiscover2;
+    TextView tvDiscover3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            tvNumber.setText(getDayNumber());
+            onButtonShowPopupWindowDiscoverClick(tvNumber);
             return true;
         }
 
@@ -153,5 +156,55 @@ public class MainActivity extends AppCompatActivity {
 
         tvPopWindows = popupView.findViewById(R.id.pw_text);
         tvPopWindows.setText(Integer.toString(getRandomNumber(1,9)));
+    }
+
+
+    public void onButtonShowPopupWindowDiscoverClick(View view) {
+
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_window_discover, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+
+        tvDiscover1 = popupView.findViewById(R.id.pw_discover1);
+        tvDiscover2 = popupView.findViewById(R.id.pw_discover2);
+        tvDiscover3 = popupView.findViewById(R.id.pw_discover3);
+
+        int num1, num2, num3;
+        num1=getRandomNumber(1,9);
+        num2=getRandomNumber(1,9);
+
+        while (num1==num2){
+            num2=getRandomNumber(1,9);
+        }
+
+        num3=getRandomNumber(1,9);
+
+        while (num3==num2 || num3==num1){
+            num3=getRandomNumber(1,9);
+        }
+
+        tvDiscover1.setText(Integer.toString(num1));
+        tvDiscover2.setText(Integer.toString(num2));
+        tvDiscover3.setText(Integer.toString(num3));
     }
 }
